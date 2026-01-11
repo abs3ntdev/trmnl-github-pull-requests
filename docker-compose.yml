@@ -1,0 +1,10 @@
+services:
+  trmnlp:
+    image: trmnl/trmnlp
+    ports:
+      - "8001:4567"
+    environment:
+      - "GITHUB_API_TOKEN=FAKE_TOKEN_FOR_DEMO_PURPOSES"
+    volumes:
+      - .:/plugin
+    command: serve
