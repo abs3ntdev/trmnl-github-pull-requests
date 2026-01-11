@@ -1,0 +1,28 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: post
+polling_url: https://api.github.com/graphql
+polling_headers: authorization=token {{ api_token }}
+polling_body: '{"query":"query ($q: String!, $first: Int!) {search(query: $q, type: ISSUE, first: $first) {nodes {... on PullRequest {numbertitleisDrafturlrepository {namenameWithOwner}comments {totalCount}reviewDecisionreviewRequests(last: 10) {nodes {requestedReviewer {... on User {login}... on Team {name}}}}reviews(last: 10) {nodes {author {login}statesubmittedAtcomments {totalCount}}}}}}}","variables":{"q":"is:pr is:open author:{{ username }}","first":10}}'
+id: 221833
+custom_fields:
+- keyname: author_bio
+  field_type: author_bio
+  name: About This Plugin
+  description: GitHub Pull Request was created by Guilherme Morais
+  category: productivity,programming
+  github_url: https://github.com/GuilhermeMorais/trmnl-github-pull-requests
+  email_address: gui.lopes@gmail.com
+- keyname: api_token
+  field_type: password
+  name: Github API Token
+  description: <a href="https://github.com/settings/personal-access-tokens">Github Personal Access Token</a> with Read access to Pull Requests.
+- keyname: username
+  field_type: string
+  name: Github Username
+  description: Used to filter the pull requests.
+name: GitHub Pull Requests
+refresh_interval: 

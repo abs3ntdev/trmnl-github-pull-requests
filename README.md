@@ -12,7 +12,7 @@ TRMNL extension to show open Pull Request on GitHub.
 
 ## Install
 
-You can go to the following link to install this recipe: https://usetrmnl.com/recipes/?????/install
+You can go to the following link to install this recipe: https://usetrmnl.com/recipes/221833/install
 Or you can copy the files from the `src` folder zip it and add it manually.
 
 ## Views
