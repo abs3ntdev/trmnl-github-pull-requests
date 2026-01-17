@@ -15,7 +15,7 @@
         class="list"
         data-list-limit="true" 
         data-list-max-columns="1"
-        data-list-hidden-count="true"
+        data-overflow-counter="true"
       >
         {% for pr in data.search.nodes %}
         {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: 'submittedAt' | last %}

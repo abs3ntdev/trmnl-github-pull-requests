@@ -1,0 +1,80 @@
+<div class="layout layout--col ">
+  <div class="label">
+        <i class="ti ti-brand-github">&nbsp;</i>Open Pull Requests
+  </div>
+  {% if length == 0 %}
+    <div class="layout layout--col">
+      <i class="ti ti-check"></i>
+      <span>No pull requests open</span>
+    </div>
+  {% else %}
+    <div class="columns">
+      <div class="grid grid--cols-1" data-list-limit="true">
+        <div class="list" data-overflow="true" data-overflow-counter="true">
+          {% for pr in data.search.nodes %}
+            {% assign latest_review = pr.reviews.nodes
+              | reject: 'author.login', username
+              | sort: 'submittedAt'
+              | last
+            %}
+            {% assign review_status = pr.reviewDecision | default: latest_review.state %}
+            <div class="item {% if review_status == "REVIEW_REQUIRED" or review_status == "CHANGES_REQUESTED" %} item--emphasis-3 {% elsif review_status == "COMMENTED" %} item--emphasis-2 {% endif %} ">
+              <div class="meta w--6">
+                <span class="index ml--0.5" data-pixel-perfect="true">
+                  {% case review_status %}
+                    {% when 'APPROVED' %}
+                      <div class="approved-icon svg-icon"></div>
+                    {% when 'CHANGES_REQUESTED' %}
+                      <div class="changes-requested-icon svg-icon"></div>
+                    {% when 'COMMENTED' %}
+                      <div class="commented-icon svg-icon"></div>
+                    {% when 'PENDING' %}
+                      <div class="pending-icon svg-icon"></div>
+                    {% when 'REVIEW_REQUIRED' %}
+                      <div class="review-required-icon svg-icon"></div>
+                    {% else %}
+                      <div class="need-attention-icon svg-icon"></div>
+                  {% endcase %}
+                </span>
+              </div>
+              <div class="content">
+                <span class="title title--small">
+                  {% if pr.isDraft %}
+                    <i class="ti ti-git-pull-request-draft"></i>
+                  {% else %}
+                    <i class="ti ti-git-pull-request"></i>
+                  {% endif %}
+                  {{ pr.title | truncate: 35 }}
+                  <span class="label label--small "> #{{ pr.number }} </span>
+                </span>
+                <span class="description">
+                  <i class="ti ti-world"></i> {{ pr.repository.name | truncate: 30 }}
+                  {% if latest_review %}
+                    {% assign comments = latest_review.comments.totalCount | plus: 0 %}
+                    <i class="ti ti-user-circle"></i>
+                    {{ latest_review.author.login | truncate: 15  }}
+                  {% else %}
+                    <i class="ti ti-user-circle"></i> No reviewer
+                    {% assign comments = 0 %}
+                  {% endif %}
+                </span>
+                <div class="flex gap--xsmall">
+                  <span class="label label--small label--underline">
+                    <i class="ti ti-message"></i> &nbsp;{{ comments | plus: pr.comments.totalCount }}
+                  </span>
+                  <span class="label label--small label--underline">
+                    {{ latest_review.submittedAt | date: 'on %d/%m at %H:%M' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+<div class="title_bar">
+  <i class="ti ti-brand-github"></i>
+  <span class="title">Open Pull Requests of {{ username }}</span>
+</div>
