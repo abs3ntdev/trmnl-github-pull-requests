@@ -9,7 +9,7 @@ watch:
 # values of custom fields (defined in src/settings.yml)
 custom_fields:
   api_token: '{{ env.GITHUB_API_TOKEN }}'
-  username: 'GuilhermeMorais'
+  username: 'GuilhermeMorais' # username for local tests
 # override variables
 variables: {}
 trmnl: {}

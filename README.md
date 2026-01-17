@@ -1,14 +1,13 @@
 # GitHub Pull Request Viewer
 
+A lightweight plugin that surfaces your open GitHub pull requests, making it easy to monitor progress without leaving your workflow.
 TRMNL extension to show open Pull Request on GitHub.
 
-## Todo
+## Screenshots
 
-[ ] Screenshot to be added to the readme
-[ ] Request publication to the TRMNL extension marketplace
-[ ] Add the plugin settings section
-[ ] Add html itself
+<img src="Full-LightMode.png" alt="Pull Request Viewer Light Mode" width="600"/>
 
+<img src="Full-DarkMode.png" alt="Pull Request Viewer Dark Mode" width="600"/>
 
 ## Install
 
