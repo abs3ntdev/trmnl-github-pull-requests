@@ -10,13 +10,11 @@
     </div>
   {% else %}
   <div class="columns">
-    <div class="column">
-      <div
-        class="list"
-        data-list-limit="true" 
-        data-list-max-columns="1"
-        data-overflow-counter="true"
-      >
+    <div class="column"
+      data-overflow="true"
+      data-overflow-counter="true"
+      data-overflow-max-cols="1">
+      <div class="list" data-list-limit="true" data-list-max-columns="1" data-overflow-counter="true" >
         {% for pr in data.search.nodes %}
         {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: 'submittedAt' | last %}
         {% assign review_status = pr.reviewDecision | default: latest_review.state %}
@@ -46,13 +44,11 @@
               {% else %}
               <i class="ti ti-git-pull-request"></i>
               {% endif %}
-              {{ pr.title }}
-              <span class="label label--small ">
-                #{{ pr.number }}
-              </span>
+              {{ pr.title | truncate: 150 }}
+              <span class="label label--small ">#{{ pr.number }} </span>
             </span>
             <span class="description">
-              <i class="ti ti-world"></i> {{ pr.repository.nameWithOwner }} 
+              <i class="ti ti-world"></i> {{ pr.repository.nameWithOwner| truncate: 75 }} 
               {% if latest_review %}
                 {% assign comments = latest_review.comments.totalCount | plus: 0 %}
                 <i class="ti ti-user-circle"></i> 
@@ -73,12 +69,10 @@
           </div>
         </div>
         {% endfor %}
-        
       </div>
     </div>
   </div>
     {% endif %}
-  <div class=""></div>
 </div>
 <div class="title_bar">
   <i class="ti ti-git-pull-request"></i>

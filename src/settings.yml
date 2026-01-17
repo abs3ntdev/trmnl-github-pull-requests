@@ -12,7 +12,7 @@ custom_fields:
 - keyname: author_bio
   field_type: author_bio
   name: About This Plugin
-  description: GitHub Pull Request was created by Guilherme Morais
+  description: Displays all your open pull requests from GitHub in one place, so you can easily track review status and pending work. GitHub Pull Request was created by Guilherme Morais
   category: productivity,programming
   github_url: https://github.com/GuilhermeMorais/trmnl-github-pull-requests
   email_address: gui.lopes@gmail.com
