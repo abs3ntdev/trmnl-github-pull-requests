@@ -9,12 +9,12 @@
       <span>No pull requests open</span>
     </div>
   {% else %}
-  <div class="columns">
-    <div class="column"
+  <div class="grid grid--cols-1 gap--small h--full">
+    <div class=""
       data-overflow="true"
       data-overflow-counter="true"
       data-overflow-max-cols="1">
-      <div class="list" data-list-limit="true" data-list-max-columns="1" data-overflow-counter="true" >
+      <div class="flex flex--col" data-list-limit="true" data-list-max-columns="1" data-overflow-counter="true" >
         {% for pr in data.search.nodes %}
         {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: 'submittedAt' | last %}
         {% assign review_status = pr.reviewDecision | default: latest_review.state %}

@@ -1,14 +1,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css" />
 {% assign username = trmnl.plugin_settings.custom_fields_values.username %}
-{% assign darkOn = trmnl.plugin_settings.dark_mode == 'yes' %}
 <style>
-
 .svg-icon {
   height: 24px;
   width: 24px;
   display: inline-block;
   margin: 4px 4px 4px 0;
-  background-color: {% if darkOn %} #fff {% else %} currentColor {% endif %};
+  background-color: currentColor;
   mask-size: contain;
   -webkit-mask-size: contain;
   mask-repeat: no-repeat;
@@ -20,7 +18,7 @@
   width: 18px;
   display: inline-block;
   margin: 4px 4px 4px 0;
-  background-color: {% if darkOn %} white {% else %} currentColor {% endif %};
+  background-color: currentColor;
   mask-size: contain;
   -webkit-mask-size: contain;
   mask-repeat: no-repeat;
