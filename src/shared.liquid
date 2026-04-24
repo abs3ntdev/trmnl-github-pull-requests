@@ -1,5 +1,49 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css" />
 {% assign username = trmnl.plugin_settings.custom_fields_values.username %}
+{% assign label_name = trmnl.plugin_settings.custom_fields_values.label %}
+
+{% comment %}
+  Merge the two search result sets and deduplicate by PR number.
+  PRs appearing in both get reason "both", otherwise "labeled" or "review".
+{% endcomment %}
+{% assign labeled_prs = data.labeled.nodes %}
+{% assign review_prs = data.review_requested.nodes %}
+
+{% assign all_prs = "" | split: "" %}
+{% assign seen_numbers = "" | split: "" %}
+
+{% for pr in labeled_prs %}
+  {% assign pr_num_str = pr.number | append: "" %}
+  {% unless seen_numbers contains pr_num_str %}
+    {% assign seen_numbers = seen_numbers | push: pr_num_str %}
+    {% assign pr_with_reason = pr %}
+    {% comment %} Check if also in review_requested {% endcomment %}
+    {% assign also_review = false %}
+    {% for rpr in review_prs %}
+      {% if rpr.number == pr.number %}
+        {% assign also_review = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+    {% if also_review %}
+      {% assign pr_reason = "both" %}
+    {% else %}
+      {% assign pr_reason = "labeled" %}
+    {% endif %}
+    {% assign all_prs = all_prs | push: pr %}
+  {% endunless %}
+{% endfor %}
+
+{% for pr in review_prs %}
+  {% assign pr_num_str = pr.number | append: "" %}
+  {% unless seen_numbers contains pr_num_str %}
+    {% assign seen_numbers = seen_numbers | push: pr_num_str %}
+    {% assign all_prs = all_prs | push: pr %}
+  {% endunless %}
+{% endfor %}
+
+{% assign length = all_prs.size %}
+
 <style>
 .svg-icon {
   height: 24px;
@@ -26,7 +70,7 @@
 }
 
 .approved-icon {
-	mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-checkbox"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>');
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-checkbox"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>');
   -webkit-mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-checkbox"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>');
 }
 
@@ -53,5 +97,15 @@
 .need-attention-icon {
   mask-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' class='icon icon-tabler icons-tabler-outline icon-tabler-eye-question'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0' /%3E%3Cpath d='M14.071 17.764a8.989 8.989 0 0 1 -2.071 .236c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.346 0 6.173 1.727 8.482 5.182' /%3E%3Cpath d='M19 22v.01' /%3E%3Cpath d='M19 19a2.003 2.003 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483' /%3E%3C/svg%3E");
   -webkit-mask-image: url("data:image/svg+xml, %3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' class='icon icon-tabler icons-tabler-outline icon-tabler-eye-question'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0' /%3E%3Cpath d='M14.071 17.764a8.989 8.989 0 0 1 -2.071 .236c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.346 0 6.173 1.727 8.482 5.182' /%3E%3Cpath d='M19 22v.01' /%3E%3Cpath d='M19 19a2.003 2.003 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483' /%3E%3C/svg%3E");
+}
+
+.reason-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.75em;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 </style>

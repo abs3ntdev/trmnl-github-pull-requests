@@ -6,23 +6,37 @@ static_data: ''
 polling_verb: post
 polling_url: https://api.github.com/graphql
 polling_headers: authorization=bearer {{ api_token }}
-polling_body: '{"query":"query ($q: String!, $first: Int!) { search(query: $q, type: ISSUE, first: $first) { nodes { ... on PullRequest { number title isDraft url repository { name nameWithOwner } comments { totalCount } reviewDecision reviewRequests(last: 10) { nodes { requestedReviewer { ... on User { login } ... on Team { name } } } } reviews(last: 20) { nodes { author { login } state submittedAt comments { totalCount } } } } } } }","variables":{"q":"is:pr is:open author:{{ username }}","first":10}}'
-id: 221833
+polling_body: '{"query":"query ($qLabel: String!, $qReview: String!, $first: Int!) { labeled: search(query: $qLabel, type: ISSUE, first: $first) { nodes { ... on PullRequest { number title isDraft url repository { name nameWithOwner } labels(first: 10) { nodes { name } } comments { totalCount } reviewDecision reviewRequests(last: 10) { nodes { requestedReviewer { ... on User { login } ... on Team { name } } } } reviews(last: 20) { nodes { author { login } state submittedAt comments { totalCount } } } } } } review_requested: search(query: $qReview, type: ISSUE, first: $first) { nodes { ... on PullRequest { number title isDraft url repository { name nameWithOwner } labels(first: 10) { nodes { name } } comments { totalCount } reviewDecision reviewRequests(last: 10) { nodes { requestedReviewer { ... on User { login } ... on Team { name } } } } reviews(last: 20) { nodes { author { login } state submittedAt comments { totalCount } } } } } } }","variables":{"qLabel":"is:pr is:open repo:{{ repo_owner }}/{{ repo_name }} label:{{ label }}","qReview":"is:pr is:open repo:{{ repo_owner }}/{{ repo_name }} review-requested:{{ username }}","first":15}}'
+id:
 custom_fields:
 - keyname: author_bio
   field_type: author_bio
   name: About This Plugin
-  description: Displays all your open pull requests from GitHub in one place, so you can easily track review status and pending work. GitHub Pull Request was created by Guilherme Morais
+  description: "Shows PRs that need your attention: either labeled for merge or requesting your review. Forked from GitHub Pull Requests by Guilherme Morais."
   category: productivity,programming
-  github_url: https://github.com/GuilhermeMorais/trmnl-github-pull-requests
-  email_address: gui.lopes@gmail.com
+  github_url: https://github.com/abs3ntdev/trmnl-github-pull-requests
 - keyname: api_token
   field_type: password
-  name: Github API Token
-  description: <a href="https://github.com/settings/personal-access-tokens">Github Personal Access Token</a> with Read access to Pull Requests.
+  name: GitHub API Token
+  description: <a href="https://github.com/settings/personal-access-tokens">GitHub Personal Access Token</a> with read access to Pull Requests.
 - keyname: username
   field_type: string
-  name: Github Username
-  description: Used to filter the pull requests.
-name: GitHub Pull Requests
+  name: GitHub Username
+  description: Your GitHub username (used to find PRs requesting your review).
+- keyname: repo_owner
+  field_type: string
+  name: Repository Owner
+  description: Owner or organization of the repo (e.g. oku-trade).
+  placeholder: oku-trade
+- keyname: repo_name
+  field_type: string
+  name: Repository Name
+  description: Name of the repository (e.g. trade).
+  placeholder: trade
+- keyname: label
+  field_type: string
+  name: Label
+  description: Label to filter PRs by (e.g. ready-to-merge).
+  placeholder: ready-to-merge
+name: GitHub PR Attention
 refresh_interval:

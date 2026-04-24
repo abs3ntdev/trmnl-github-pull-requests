@@ -1,12 +1,12 @@
 <div class="layout layout--col">
   <div class="title">
     <i class="ti ti-brand-github"> </i>
-    Open Pull Requests
+    PRs Needing Attention
   </div>
   {% if length == 0 %}
     <div class="layout layout--col">
       <i class="ti ti-check"></i>
-      <span>No pull requests open</span>
+      <span>No PRs need attention</span>
     </div>
   {% else %}
   <div class="grid grid--cols-1 gap--small h--full">
@@ -15,10 +15,25 @@
       data-overflow-counter="true"
       data-overflow-max-cols="1">
       <div class="flex flex--col" data-list-limit="true" data-list-max-columns="1" data-overflow-counter="true" >
-        {% for pr in data.search.nodes %}
+        {% for pr in all_prs %}
         {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: 'submittedAt' | last %}
         {% assign review_status = pr.reviewDecision | default: latest_review.state %}
-        <div class="item {% if review_status == "REVIEW_REQUIRED" or review_status == "CHANGES_REQUESTED" %} item--emphasis-3 {% elsif review_status == "COMMENTED" %} item--emphasis-2 {% endif %} ">
+        {% comment %} Determine reason for this PR {% endcomment %}
+        {% assign has_label = false %}
+        {% for lbl in pr.labels.nodes %}
+          {% if lbl.name == label_name %}
+            {% assign has_label = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% assign is_reviewer = false %}
+        {% for rr in pr.reviewRequests.nodes %}
+          {% if rr.requestedReviewer.login == username %}
+            {% assign is_reviewer = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        <div class="item {% if review_status == 'REVIEW_REQUIRED' or review_status == 'CHANGES_REQUESTED' %} item--emphasis-3 {% elsif review_status == 'COMMENTED' %} item--emphasis-2 {% endif %} ">
           <div class="meta w--6">
             <span class="index ml--0.5" data-pixel-perfect="true">
               {% case review_status %}
@@ -29,7 +44,7 @@
                 {% when "COMMENTED" %}
                   <div class="commented-icon svg-icon"></div>
                 {% when "PENDING" %}
-                  <div class="pending-icon svg-icon"></div>                  
+                  <div class="pending-icon svg-icon"></div>
                 {% when "REVIEW_REQUIRED" %}
                   <div class="review-required-icon svg-icon"></div>
                 {% else %}
@@ -44,27 +59,32 @@
               {% else %}
               <i class="ti ti-git-pull-request"></i>
               {% endif %}
-              {{ pr.title | truncate: 150 }}
+              {{ pr.title | truncate: 120 }}
               <span class="label label--small ">#{{ pr.number }} </span>
             </span>
             <span class="description">
-              <i class="ti ti-world"></i> {{ pr.repository.nameWithOwner| truncate: 75 }} 
+              {% if has_label and is_reviewer %}
+                <span class="reason-tag"><i class="ti ti-tag"></i> {{ label_name }}</span>
+                <span class="reason-tag"><i class="ti ti-eye"></i> reviewer</span>
+              {% elsif has_label %}
+                <span class="reason-tag"><i class="ti ti-tag"></i> {{ label_name }}</span>
+              {% elsif is_reviewer %}
+                <span class="reason-tag"><i class="ti ti-eye"></i> reviewer</span>
+              {% endif %}
               {% if latest_review %}
-                {% assign comments = latest_review.comments.totalCount | plus: 0 %}
-                <i class="ti ti-user-circle"></i> 
+                <i class="ti ti-user-circle"></i>
                 {{ latest_review.author.login }}
-              {% else %}
-                <i class="ti ti-user-circle"></i> No reviewer
-                {% assign comments = 0 %}
               {% endif %}
             </span>
             <div class="flex gap--xsmall">
               <span class="label label--small label--underline">
-                <i class="ti ti-message"></i> &nbsp;{{ comments | plus: pr.comments.totalCount }} 
+                <i class="ti ti-message"></i> &nbsp;{{ pr.comments.totalCount }}
               </span>
+              {% if latest_review %}
               <span class="label label--small label--underline">
                  {{ latest_review.submittedAt | date: "on %d/%m at %H:%M" }}
               </span>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -76,5 +96,5 @@
 </div>
 <div class="title_bar">
   <i class="ti ti-git-pull-request"></i>
-  <span class="title">Pull Requests of {{ username }}</span>
+  <span class="title">PR Attention &middot; {{ length }} open</span>
 </div>
