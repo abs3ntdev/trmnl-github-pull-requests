@@ -2,8 +2,8 @@
 {% assign username = trmnl.plugin_settings.custom_fields_values.username %}
 {% assign label_name = trmnl.plugin_settings.custom_fields_values.label %}
 
-{% assign labeled_prs = labeled.nodes %}
-{% assign review_prs = review_requested.nodes %}
+{% assign labeled_prs = data.labeled.nodes %}
+{% assign review_prs = data.review_requested.nodes %}
 
 {% assign all_prs = "" | split: "" %}
 {% assign seen_numbers = "" | split: "" %}
