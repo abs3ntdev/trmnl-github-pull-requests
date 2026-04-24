@@ -4,10 +4,18 @@
 
 {% comment %}
   Merge the two search result sets and deduplicate by PR number.
-  PRs appearing in both get reason "both", otherwise "labeled" or "review".
+  Try both data.labeled and labeled to handle different TRMNL data paths.
 {% endcomment %}
-{% assign labeled_prs = data.labeled.nodes %}
-{% assign review_prs = data.review_requested.nodes %}
+{% if data.labeled %}
+  {% assign labeled_prs = data.labeled.nodes %}
+{% else %}
+  {% assign labeled_prs = labeled.nodes %}
+{% endif %}
+{% if data.review_requested %}
+  {% assign review_prs = data.review_requested.nodes %}
+{% else %}
+  {% assign review_prs = review_requested.nodes %}
+{% endif %}
 
 {% assign all_prs = "" | split: "" %}
 {% assign seen_numbers = "" | split: "" %}
@@ -16,20 +24,6 @@
   {% assign pr_num_str = pr.number | append: "" %}
   {% unless seen_numbers contains pr_num_str %}
     {% assign seen_numbers = seen_numbers | push: pr_num_str %}
-    {% assign pr_with_reason = pr %}
-    {% comment %} Check if also in review_requested {% endcomment %}
-    {% assign also_review = false %}
-    {% for rpr in review_prs %}
-      {% if rpr.number == pr.number %}
-        {% assign also_review = true %}
-        {% break %}
-      {% endif %}
-    {% endfor %}
-    {% if also_review %}
-      {% assign pr_reason = "both" %}
-    {% else %}
-      {% assign pr_reason = "labeled" %}
-    {% endif %}
     {% assign all_prs = all_prs | push: pr %}
   {% endunless %}
 {% endfor %}
