@@ -1,30 +1,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css" />
 {% assign username = trmnl.plugin_settings.custom_fields_values.username %}
 {% assign label_name = trmnl.plugin_settings.custom_fields_values.label %}
-
-{% assign labeled_prs = data.labeled.nodes %}
-{% assign review_prs = data.review_requested.nodes %}
-
-{% assign all_prs = "" | split: "" %}
-{% assign seen_numbers = "" | split: "" %}
-
-{% for pr in labeled_prs %}
-  {% assign pr_num_str = pr.number | append: "" %}
-  {% unless seen_numbers contains pr_num_str %}
-    {% assign seen_numbers = seen_numbers | push: pr_num_str %}
-    {% assign all_prs = all_prs | push: pr %}
-  {% endunless %}
-{% endfor %}
-
-{% for pr in review_prs %}
-  {% assign pr_num_str = pr.number | append: "" %}
-  {% unless seen_numbers contains pr_num_str %}
-    {% assign seen_numbers = seen_numbers | push: pr_num_str %}
-    {% assign all_prs = all_prs | push: pr %}
-  {% endunless %}
-{% endfor %}
-
-{% assign length = all_prs.size %}
+{% assign labeled_count = data.labeled.nodes.size | plus: 0 %}
+{% assign review_count = data.review_requested.nodes.size | plus: 0 %}
 
 <style>
 .svg-icon {

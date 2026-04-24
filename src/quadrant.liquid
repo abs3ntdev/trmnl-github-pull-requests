@@ -1,8 +1,8 @@
-<div class="layout layout--col ">
+<div class="layout layout--col">
   <div class="label">
     <i class="ti ti-brand-github">&nbsp;</i>PR Attention
   </div>
-  {% if length == 0 %}
+  {% if labeled_count == 0 and review_count == 0 %}
     <div class="layout layout--col">
       <i class="ti ti-check"></i>
       <span>All clear</span>
@@ -11,45 +11,75 @@
     <div class="columns">
       <div class="grid grid--cols-1" data-list-limit="true">
         <div class="list" data-overflow="true" data-overflow-counter="true">
-          {% for pr in all_prs %}
-            {% assign latest_review = pr.reviews.nodes | reject: 'author.login', username | sort: 'submittedAt' | last %}
-            {% assign review_status = pr.reviewDecision | default: latest_review.state %}
-            {% assign has_label = false %}
-            {% for lbl in pr.labels.nodes %}
-              {% if lbl.name == label_name %}{% assign has_label = true %}{% break %}{% endif %}
-            {% endfor %}
-            {% assign is_reviewer = false %}
-            {% for rr in pr.reviewRequests.nodes %}
-              {% if rr.requestedReviewer.login == username %}{% assign is_reviewer = true %}{% break %}{% endif %}
-            {% endfor %}
-            <div class="item {% if review_status == 'REVIEW_REQUIRED' or review_status == 'CHANGES_REQUESTED' %} item--emphasis-3 {% elsif review_status == 'COMMENTED' %} item--emphasis-2 {% endif %} ">
-              <div class="meta w--5">
-                <span class="index ml--0.5" data-pixel-perfect="true">
-                  {% case review_status %}
-                    {% when 'APPROVED' %}<div class="approved-icon svg-icon-small"></div>
-                    {% when 'CHANGES_REQUESTED' %}<div class="changes-requested-icon svg-icon-small"></div>
-                    {% when 'COMMENTED' %}<div class="commented-icon svg-icon-small"></div>
-                    {% when 'PENDING' %}<div class="pending-icon svg-icon-small"></div>
-                    {% when 'REVIEW_REQUIRED' %}<div class="review-required-icon svg-icon-small"></div>
-                    {% else %}<div class="need-attention-icon svg-icon-small"></div>
-                  {% endcase %}
-                </span>
-              </div>
-              <div class="content">
-                <span class="title title--small">
-                  {% if pr.isDraft %}<i class="ti ti-git-pull-request-draft"></i>
-                  {% else %}<i class="ti ti-git-pull-request"></i>{% endif %}
-                  {{ pr.title | truncate: 40 }}
-                  <span class="label label--small ">#{{ pr.number }}</span>
-                </span>
-                <span class="description">
-                  {% if has_label %}<i class="ti ti-tag"></i>{% endif %}
-                  {% if is_reviewer %}<i class="ti ti-eye"></i>{% endif %}
-                  <i class="ti ti-message"></i> {{ pr.comments.totalCount }}
-                </span>
-              </div>
+
+          {% for pr in data.labeled.nodes %}
+          {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: "submittedAt" | last %}
+          {% assign review_status = pr.reviewDecision | default: latest_review.state %}
+          <div class="item {% if review_status == 'REVIEW_REQUIRED' or review_status == 'CHANGES_REQUESTED' %} item--emphasis-3 {% elsif review_status == 'COMMENTED' %} item--emphasis-2 {% endif %}">
+            <div class="meta w--5">
+              <span class="index ml--0.5" data-pixel-perfect="true">
+                {% case review_status %}
+                  {% when "APPROVED" %}<div class="approved-icon svg-icon-small"></div>
+                  {% when "CHANGES_REQUESTED" %}<div class="changes-requested-icon svg-icon-small"></div>
+                  {% when "COMMENTED" %}<div class="commented-icon svg-icon-small"></div>
+                  {% when "PENDING" %}<div class="pending-icon svg-icon-small"></div>
+                  {% when "REVIEW_REQUIRED" %}<div class="review-required-icon svg-icon-small"></div>
+                  {% else %}<div class="need-attention-icon svg-icon-small"></div>
+                {% endcase %}
+              </span>
             </div>
+            <div class="content">
+              <span class="title title--small">
+                {% if pr.isDraft %}<i class="ti ti-git-pull-request-draft"></i>
+                {% else %}<i class="ti ti-git-pull-request"></i>{% endif %}
+                {{ pr.title | truncate: 40 }}
+                <span class="label label--small">#{{ pr.number }}</span>
+              </span>
+              <span class="description">
+                <i class="ti ti-tag"></i>
+                <i class="ti ti-message"></i> {{ pr.comments.totalCount }}
+              </span>
+            </div>
+          </div>
           {% endfor %}
+
+          {% for pr in data.review_requested.nodes %}
+          {% assign already_shown = false %}
+          {% for lpr in data.labeled.nodes %}
+            {% if lpr.number == pr.number %}{% assign already_shown = true %}{% break %}{% endif %}
+          {% endfor %}
+          {% unless already_shown %}
+          {% assign latest_review = pr.reviews.nodes | reject: "author.login", username | sort: "submittedAt" | last %}
+          {% assign review_status = pr.reviewDecision | default: latest_review.state %}
+          <div class="item {% if review_status == 'REVIEW_REQUIRED' or review_status == 'CHANGES_REQUESTED' %} item--emphasis-3 {% elsif review_status == 'COMMENTED' %} item--emphasis-2 {% endif %}">
+            <div class="meta w--5">
+              <span class="index ml--0.5" data-pixel-perfect="true">
+                {% case review_status %}
+                  {% when "APPROVED" %}<div class="approved-icon svg-icon-small"></div>
+                  {% when "CHANGES_REQUESTED" %}<div class="changes-requested-icon svg-icon-small"></div>
+                  {% when "COMMENTED" %}<div class="commented-icon svg-icon-small"></div>
+                  {% when "PENDING" %}<div class="pending-icon svg-icon-small"></div>
+                  {% when "REVIEW_REQUIRED" %}<div class="review-required-icon svg-icon-small"></div>
+                  {% else %}<div class="need-attention-icon svg-icon-small"></div>
+                {% endcase %}
+              </span>
+            </div>
+            <div class="content">
+              <span class="title title--small">
+                {% if pr.isDraft %}<i class="ti ti-git-pull-request-draft"></i>
+                {% else %}<i class="ti ti-git-pull-request"></i>{% endif %}
+                {{ pr.title | truncate: 40 }}
+                <span class="label label--small">#{{ pr.number }}</span>
+              </span>
+              <span class="description">
+                <i class="ti ti-eye"></i>
+                <i class="ti ti-message"></i> {{ pr.comments.totalCount }}
+              </span>
+            </div>
+          </div>
+          {% endunless %}
+          {% endfor %}
+
         </div>
       </div>
     </div>
@@ -57,5 +87,5 @@
 </div>
 <div class="title_bar">
   <i class="ti ti-brand-github"></i>
-  <span class="title">PR Attention &middot; {{ length }}</span>
+  <span class="title">PR Attention</span>
 </div>
